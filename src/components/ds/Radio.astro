@@ -1,0 +1,57 @@
+---
+interface Props {
+  name: string;
+  options: string[];
+  value?: string;
+  direction?: 'row' | 'column';
+  label?: string;
+}
+
+const { name, options, value, direction = 'column', label } = Astro.props;
+---
+<div role="radiogroup" aria-label={label} class:list={['radio-group', `radio-group--${direction}`]}>
+  {options.map((o) => (
+    <label class="radio">
+      <input type="radio" name={name} value={o} checked={o === value} />
+      {o}
+    </label>
+  ))}
+</div>
+
+<style>
+  .radio-group { display: flex; flex-direction: column; gap: 12px; }
+  .radio-group--row { flex-direction: row; flex-wrap: wrap; gap: 24px; }
+  .radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-body);
+  }
+  input {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: #fff;
+    display: inline-grid;
+    place-content: center;
+    cursor: pointer;
+  }
+  input::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--navy-800);
+    transform: scale(0);
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+  input:checked { border-color: var(--navy-800); }
+  input:checked::before { transform: scale(1); }
+</style>

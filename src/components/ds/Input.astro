@@ -1,0 +1,73 @@
+---
+// Text field (input or textarea). Error messages are set from the client with setFieldError().
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+type Props = HTMLAttributes<'input'> & {
+  label?: string;
+  hint?: string;
+  icon?: string;
+  multiline?: boolean;
+  rows?: number;
+  name: string;
+};
+
+const { label, hint, icon, multiline = false, rows = 4, id, name, class: className, ...rest } = Astro.props;
+const uid = id ?? `f-${name}`;
+---
+<div class:list={['field', { 'field--icon': !!icon, 'field--multiline': multiline }, className]}>
+  {label && <label for={uid} class="field__label">{label}</label>}
+  <div class="field__control">
+    {icon && <Icon name={icon} size={18} color="var(--stone-500)" class="field__icon" />}
+    {multiline ? (
+      <textarea id={uid} name={name} rows={rows} class="field__input" aria-describedby={`${uid}-msg`} {...(rest as HTMLAttributes<'textarea'>)} />
+    ) : (
+      <input id={uid} name={name} class="field__input" aria-describedby={`${uid}-msg`} {...rest} />
+    )}
+  </div>
+  <span id={`${uid}-msg`} class="field__msg" data-hint={hint ?? ''}>{hint}</span>
+</div>
+
+<style>
+  .field { display: flex; flex-direction: column; }
+  .field__label {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    margin-bottom: 8px;
+  }
+  .field__control { position: relative; display: flex; align-items: center; }
+  .field--multiline .field__control { align-items: flex-start; }
+  .field :global(.field__icon) { position: absolute; left: 14px; }
+  .field--multiline :global(.field__icon) { top: 14px; }
+
+  .field__input {
+    width: 100%;
+    height: var(--control-h-md);
+    padding: 0 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    background: #fff;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-body);
+    outline: none;
+    resize: vertical;
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  textarea.field__input { height: auto; padding: 12px 14px; }
+  .field--icon .field__input { padding-left: 42px; }
+  .field__input::placeholder { color: var(--stone-400); }
+  .field__input:focus { border-color: var(--navy-800); box-shadow: var(--shadow-focus); }
+  .field__input:disabled { background: var(--ivory); }
+
+  .field__msg { font-size: 13px; margin-top: 6px; color: var(--text-subtle); }
+  .field__msg:empty { display: none; }
+  :global(.field.is-invalid) .field__input { border-color: var(--status-danger); }
+  :global(.field.is-invalid) .field__msg { color: var(--status-danger); }
+</style>

@@ -1,0 +1,60 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+type Props = HTMLAttributes<'select'> & {
+  label?: string;
+  hint?: string;
+  options: string[];
+  value?: string;
+  name: string;
+};
+
+const { label, hint, options, value, id, name, class: className, ...rest } = Astro.props;
+const uid = id ?? `f-${name}`;
+---
+<div class:list={['field', className]}>
+  {label && <label for={uid} class="field__label">{label}</label>}
+  <div class="field__control">
+    <select id={uid} name={name} class="field__select" aria-describedby={`${uid}-msg`} {...rest}>
+      {options.map((o) => <option value={o} selected={o === value}>{o}</option>)}
+    </select>
+    <Icon name="chevron-down" size={18} color="var(--navy-800)" class="field__chevron" />
+  </div>
+  <span id={`${uid}-msg`} class="field__msg" data-hint={hint ?? ''}>{hint}</span>
+</div>
+
+<style>
+  .field { display: flex; flex-direction: column; }
+  .field__label {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    margin-bottom: 8px;
+  }
+  .field__control { position: relative; }
+  .field__select {
+    width: 100%;
+    height: var(--control-h-md);
+    padding: 0 40px 0 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    background: #fff;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-body);
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  .field__select:focus { border-color: var(--navy-800); box-shadow: var(--shadow-focus); }
+  .field :global(.field__chevron) { position: absolute; right: 14px; top: 13px; pointer-events: none; }
+  .field__msg { font-size: 13px; margin-top: 6px; color: var(--text-subtle); }
+  .field__msg:empty { display: none; }
+</style>

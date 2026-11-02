@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Card from '../components/ds/Card.astro';
+import Photo from '../components/ds/Photo.astro';
+import Button from '../components/ds/Button.astro';
+import { routes } from '../data/site';
+import { grupos } from '../data/grupos';
+
+const contacto = `${routes.nosotros}#contacto`;
+---
+<BaseLayout
+  title="Comunidad · Parroquia San Juan Pablo II"
+  description="Grupos parroquiales para cada etapa de la vida: jóvenes, matrimonios, catequesis, coro, oración y servicio."
+  active="comunidad"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Comunidad"
+    title="Encuentra tu lugar"
+    lead="Grupos para cada etapa de la vida. Nadie tiene que caminar solo: elige uno, acércate y preséntate. Te recibimos tal como llegas."
+    photoLabel="Foto: Grupo parroquial reunido"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="groups">
+        {grupos.map((g) => (
+          <Card image={g.img} imageLabel={`Foto: ${g.t}`} eyebrow={g.e} title={g.t} description={g.d} cta="Quiero participar" href={contacto} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--subtle">
+    <div class="container split serve">
+      <div class="serve__photo">
+        <Photo label="Foto: Voluntarios de Cáritas" aspect="4/3" />
+      </div>
+      <div class="serve__text">
+        <SectionHeading
+          eyebrow="Servir"
+          title="¿No sabes por dónde empezar?"
+          lead="Cuéntanos un poco de ti y te ayudamos a encontrar el grupo que va contigo. Muchos llegamos así, sin conocer a nadie."
+        />
+        <Button variant="primary" iconRight="arrow-right" href={contacto}>Escríbenos</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: clamp(32px, 4vw, 40px) 24px;
+  }
+  .serve { align-items: center; }
+  .serve__photo { border-radius: var(--radius-sm); overflow: hidden; }
+  .serve__text { display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
+</style>

@@ -13,5 +13,14 @@ npm run build    # genera dist/
 
 - `src/styles/tokens/` — tokens del sistema de diseño (colores, tipografía, espaciado, efectos).
 - `src/components/ds/` — componentes del sistema de diseño (Button, IconButton, Icon, Photo, Card, SectionHeading).
-- `src/components/` — SiteHeader, PageHero, SiteFooter.
-- `src/data/site.ts` — rutas, navegación y datos de la parroquia (dirección, teléfono y redes son de ejemplo).
+- `src/components/` — SiteHeader, PageHero, SiteFooter, CtaBand.
+- `src/pages/` — Inicio, Horarios, Sacramentos, Comunidad, Eventos, Nosotros, Oración y Donativos.
+- `src/data/` — datos editables: parroquia (`site.ts`), horarios, grupos y eventos. Todos son de ejemplo.
+- `src/lib/forms.ts` — validación y envío de los formularios.
+
+### Formularios
+
+Contacto, peticiones de oración y avisos de donativo se envían como JSON a la URL de
+`PUBLIC_FORMS_ENDPOINT` (ver `.env.example`). Sin esa variable los formularios muestran su
+confirmación, pero no envían nada. El donativo en línea todavía no está conectado a una
+pasarela de pago.

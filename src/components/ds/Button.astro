@@ -10,6 +10,8 @@ interface Props {
   href?: string;
   type?: 'button' | 'submit' | 'reset';
   class?: string;
+  /** Hooks for page scripts, e.g. data-copy or aria-live. */
+  [attr: `data-${string}` | `aria-${string}`]: string | boolean | undefined;
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   href,
   type = 'button',
   class: className,
+  ...rest
 } = Astro.props;
 
 const iconSize = { sm: 14, md: 16, lg: 18 }[size];
@@ -30,6 +33,7 @@ const Tag = href ? 'a' : 'button';
   href={href}
   type={href ? undefined : type}
   class:list={['btn', `btn--${variant}`, `btn--${size}`, { 'btn--full': fullWidth }, className]}
+  {...rest}
 >
   {icon && <Icon name={icon} size={iconSize} />}
   <slot />

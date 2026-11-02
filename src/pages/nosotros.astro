@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Photo from '../components/ds/Photo.astro';
+import Icon from '../components/ds/Icon.astro';
+import Button from '../components/ds/Button.astro';
+import Input from '../components/ds/Input.astro';
+import Select from '../components/ds/Select.astro';
+import { parish } from '../data/site';
+
+const equipo = [
+  { n: 'Pbro. Nombre del Vicario', r: 'Vicario parroquial' },
+  { n: 'Equipo del despacho', r: 'Atención y trámites' },
+];
+
+const datos = [
+  { i: 'map-pin', k: 'Dirección', v: `${parish.address}, Corregidora, Qro.` },
+  { i: 'phone', k: 'Despacho', v: parish.phone },
+  { i: 'mail', k: 'Correo', v: parish.email },
+  { i: 'clock', k: 'Horario de despacho', v: parish.officeHours.join(' · ') },
+];
+
+const asuntos = ['Información general', 'Sacramentos', 'Hablar con un sacerdote', 'Grupos y voluntariado', 'Constancias y trámites'];
+---
+<BaseLayout
+  title="Nosotros · Parroquia San Juan Pablo II"
+  description="Historia, patrono, párroco y datos de contacto de la Parroquia San Juan Pablo II en Corregidora, Querétaro."
+  active="nosotros"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Nosotros"
+    title="Una familia de fe en Corregidora"
+    lead="Somos una comunidad joven que lleva el nombre de un santo que nos enseñó a no tener miedo y a abrir las puertas a Cristo."
+    photoLabel="Foto: Comunidad reunida frente al templo"
+  />
+
+  <section class="section">
+    <div class="container split centered">
+      <div class="prose">
+        <SectionHeading eyebrow="Nuestra historia" title="De una capilla a una parroquia" />
+        <p>La comunidad comenzó a reunirse en una pequeña capilla, con Misa los domingos y un grupo de familias que organizaba la catequesis en sus casas. Con los años, el crecimiento de las colonias de Corregidora hizo necesaria una parroquia propia.</p>
+        <p>Hoy seguimos construyendo el templo con el esfuerzo de todos, y celebramos los sacramentos, acompañamos a los enfermos y servimos a quienes más lo necesitan.</p>
+      </div>
+      <div class="rounded">
+        <Photo label="Foto: Primera capilla de la comunidad" aspect="4/3" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--inverse">
+    <figure class="quote">
+      <figcaption class="quote__eyebrow">Nuestro patrono</figcaption>
+      <blockquote class="quote__text">“¡No tengan miedo! Abran, más todavía, abran de par en par las puertas a Cristo.”</blockquote>
+      <span class="quote__cite">San Juan Pablo II · 22 de octubre de 1978</span>
+    </figure>
+  </section>
+
+  <section class="section">
+    <div class="container split centered" style="--split-min: 300px">
+      <div class="rounded portrait">
+        <Photo label="Foto: Retrato del párroco" aspect="4/5" />
+      </div>
+      <div class="prose">
+        <SectionHeading eyebrow="Nuestro párroco" title="Pbro. Nombre del Párroco" />
+        <p>Ordenado sacerdote para la Diócesis de Querétaro, acompaña a esta comunidad desde su erección como parroquia. Lo encuentras en el despacho los martes y jueves por la tarde, y después de cada Misa dominical.</p>
+        <div class="rule-list">
+          {equipo.map((p) => (
+            <div class="rule-row"><span class="rule-row__key">{p.n}</span><span class="rule-row__value">{p.r}</span></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto" class="section section--subtle contact">
+    <div class="container split" style="--split-min: 360px">
+      <div class="contact__info">
+        <SectionHeading
+          eyebrow="Contacto"
+          title="Estamos para escucharte"
+          lead="Escríbenos para trámites, dudas sobre sacramentos o si quieres hablar con un sacerdote."
+        />
+        <div class="rule-list">
+          {datos.map((d) => (
+            <div class="contact__row">
+              <Icon name={d.i} size={20} color="var(--gold-600)" class="contact__icon" />
+              <div class="contact__text">
+                <span class="contact__key">{d.k}</span>
+                <span class="contact__value">{d.v}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div class="rounded">
+          <Photo label="Mapa: ubicación del templo" aspect="16/9" />
+        </div>
+      </div>
+
+      <div class="panel">
+        <form class="form-stack" data-contact-form novalidate>
+          <h2 class="panel__title">Envíanos un mensaje</h2>
+          <Input label="Nombre" name="nombre" autocomplete="name" />
+          <div class="form-grid">
+            <Input label="Correo" name="correo" type="email" autocomplete="email" />
+            <Input label="Teléfono (opcional)" name="telefono" type="tel" autocomplete="tel" />
+          </div>
+          <Select label="Asunto" name="asunto" options={asuntos} />
+          <Input label="Mensaje" name="mensaje" multiline rows={5} />
+          <p class="form-alert" data-form-alert hidden>No pudimos enviar tu mensaje. Intenta de nuevo o llámanos al {parish.phone}.</p>
+          <Button variant="primary" size="lg" type="submit" fullWidth iconRight="arrow-right">Enviar mensaje</Button>
+        </form>
+
+        <div class="success" data-contact-success hidden>
+          <span class="success__icon"><Icon name="mail" size={24} /></span>
+          <h2 class="success__title" data-success-title tabindex="-1"></h2>
+          <p class="success__text" data-success-text></p>
+          <Button variant="secondary" data-contact-reset>Enviar otro mensaje</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { isEmail, sendForm, setFieldError, value } from '../lib/forms';
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]')!;
+  const success = document.querySelector<HTMLElement>('[data-contact-success]')!;
+  const alertEl = form.querySelector<HTMLElement>('[data-form-alert]')!;
+  let tried = false;
+
+  function validate() {
+    const errors = {
+      nombre: value(form, 'nombre') ? undefined : 'Escribe tu nombre.',
+      correo: isEmail(value(form, 'correo')) ? undefined : 'Revisa tu correo.',
+      mensaje: value(form, 'mensaje') ? undefined : 'Escribe tu mensaje.',
+    };
+    for (const [k, msg] of Object.entries(errors)) setFieldError(form, k, msg);
+    return Object.values(errors).every((e) => !e);
+  }
+
+  form.addEventListener('input', () => tried && validate());
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    tried = true;
+    if (!validate()) return;
+    alertEl.hidden = true;
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      await sendForm('contacto', data);
+    } catch {
+      alertEl.hidden = false;
+      return;
+    }
+    const nombre = value(form, 'nombre').split(' ')[0];
+    success.querySelector('[data-success-title]')!.textContent = `Gracias, ${nombre}. Recibimos tu mensaje.`;
+    success.querySelector('[data-success-text]')!.textContent = `Te responderemos a ${value(form, 'correo')} en un máximo de dos días hábiles.`;
+    form.hidden = true;
+    success.hidden = false;
+    success.querySelector<HTMLElement>('[data-success-title]')!.focus();
+  });
+
+  success.querySelector('[data-contact-reset]')!.addEventListener('click', () => {
+    form.reset();
+    tried = false;
+    ['nombre', 'correo', 'mensaje'].forEach((k) => setFieldError(form, k));
+    success.hidden = true;
+    form.hidden = false;
+  });
+</script>
+
+<style>
+  .centered { align-items: center; }
+  .prose { display: flex; flex-direction: column; gap: 24px; }
+  .prose p { margin: 0; font-size: 17px; line-height: 1.7; color: var(--text-body); text-wrap: pretty; }
+  .rounded { border-radius: var(--radius-sm); overflow: hidden; }
+  .portrait { max-width: 420px; width: 100%; }
+
+  .quote {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+  }
+  .quote__eyebrow {
+    order: -1;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold-500);
+  }
+  .quote__text {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(26px, 4.4vw, 44px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.01em;
+    color: #fff;
+    text-wrap: balance;
+  }
+  .quote__cite { font-size: 16px; color: var(--navy-200); }
+
+  .contact { scroll-margin-top: var(--header-h); }
+  .contact .split { align-items: start; }
+  .contact__info { display: flex; flex-direction: column; gap: 32px; }
+  .contact__row { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--border-default); }
+  .contact :global(.contact__icon) { margin-top: 2px; }
+  .contact__text { display: flex; flex-direction: column; gap: 2px; }
+  .contact__key {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .contact__value { font-size: 16px; line-height: 1.5; color: var(--text-heading); }
+</style>

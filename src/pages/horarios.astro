@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Button from '../components/ds/Button.astro';
+import { parish, routes, telHref } from '../data/site';
+import { misas, confesiones, despacho } from '../data/horarios';
+---
+<BaseLayout
+  title="Horarios · Parroquia San Juan Pablo II"
+  description="Horarios de Misa, confesiones y despacho parroquial de la Parroquia San Juan Pablo II en Corregidora, Querétaro."
+  active="horarios"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Horarios"
+    title="Horarios de Misa y confesiones"
+    lead="Te esperamos en el templo parroquial. Si es tu primera vez, llega unos minutos antes: alguien del equipo de bienvenida te recibirá en la entrada."
+    photoLabel="Foto: Fachada del templo"
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Santa Misa" title="Celebra la Eucaristía" />
+      <div class="mass-grid">
+        {misas.map((b) => (
+          <div class="rule-list">
+            <h3 class="mass-day">{b.dia}</h3>
+            {b.misas.map((m) => (
+              <div class="mass-row">
+                <span class="mass-row__time">{m.h}</span>
+                <span class="mass-row__what">{m.t}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--subtle">
+    <div class="container split">
+      <div class="col">
+        <SectionHeading size="sm" eyebrow="Reconciliación" title="Confesiones" lead="Un sacerdote te escucha sin prisa. No necesitas cita en estos horarios." />
+        <div class="rule-list">
+          {confesiones.map((c) => (
+            <div class="rule-row"><span class="rule-row__key">{c.d}</span><span class="rule-row__value">{c.h}</span></div>
+          ))}
+        </div>
+      </div>
+      <div class="col">
+        <SectionHeading size="sm" eyebrow="Despacho parroquial" title="Trámites y atención" lead="Constancias, fe de bautismo, intenciones de Misa y agenda de sacramentos." />
+        <div class="rule-list">
+          {despacho.map((c) => (
+            <div class="rule-row"><span class="rule-row__key">{c.d}</span><span class="rule-row__value">{c.h}</span></div>
+          ))}
+        </div>
+        <div class="actions">
+          <Button variant="primary" icon="phone" href={telHref(parish.phone)}>{parish.phone}</Button>
+          <Button variant="secondary" icon="map-pin" href={`${routes.nosotros}#contacto`}>Cómo llegar</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Sacramentos"
+    title="¿Preparas un Bautismo, una boda o una Primera Comunión?"
+    cta="Ver requisitos"
+    iconRight="arrow-right"
+    href={routes.sacramentos}
+  />
+</BaseLayout>
+
+<style>
+  .mass-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: clamp(32px, 5vw, 56px);
+    margin-top: 48px;
+  }
+  .mass-day {
+    margin: 0;
+    padding: 20px 0 8px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+  }
+  .mass-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .mass-row__time {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-heading);
+    width: 88px;
+    flex: none;
+  }
+  .mass-row__what { font-size: 16px; color: var(--text-muted); }
+
+  .col { display: flex; flex-direction: column; gap: 32px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+</style>

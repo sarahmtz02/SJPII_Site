@@ -1,0 +1,304 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import IconButton from '../components/ds/IconButton.astro';
+import Icon from '../components/ds/Icon.astro';
+import { eventos } from '../data/eventos';
+
+const dows = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+---
+<BaseLayout
+  title="Eventos · Parroquia San Juan Pablo II"
+  description="Calendario parroquial: celebraciones, retiros y encuentros de la comunidad."
+  active="eventos"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Eventos"
+    title="Calendario parroquial"
+    lead="Celebraciones, retiros y encuentros de la comunidad. Todos están abiertos a quien quiera acompañarnos."
+    photoLabel="Foto: Procesión en el atrio"
+  />
+
+  <section class="cal-section">
+    <div class="cal-layout" data-calendar data-events={JSON.stringify(eventos)}>
+      <div class="cal">
+        <div class="cal__head">
+          <IconButton icon="chevron-left" label="Mes anterior" variant="outline" data-cal-prev />
+          <h2 class="cal__month" data-cal-month aria-live="polite"></h2>
+          <IconButton icon="chevron-right" label="Mes siguiente" variant="outline" data-cal-next />
+        </div>
+        <div class="cal__grid" data-cal-grid>
+          {dows.map((d) => <div class="cal__dow" aria-hidden="true">{d}</div>)}
+        </div>
+        <div class="cal__legend">
+          <span><span class="legend-dot" />Día con evento</span>
+          <span><span class="legend-ring" />Hoy</span>
+        </div>
+      </div>
+
+      <div class="agenda">
+        <div class="agenda__head">
+          <span class="agenda__label"><span class="agenda__rule" /><span data-agenda-label>Este mes</span></span>
+          <button type="button" class="agenda__all" data-agenda-all hidden>Ver todo el mes</button>
+        </div>
+        <div class="rule-list" data-agenda-list aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <template id="cal-icons">
+    <span data-icon="clock"><Icon name="clock" size={14} /></span>
+    <span data-icon="map-pin"><Icon name="map-pin" size={14} /></span>
+  </template>
+</BaseLayout>
+
+<script>
+  import type { Evento } from '../data/eventos';
+
+  const MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const DOW = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const LIT: Record<string, string> = { blanco: 'Blanco', morado: 'Morado', rosa: 'Rosa', verde: 'Verde', rojo: 'Rojo' };
+
+  const root = document.querySelector<HTMLElement>('[data-calendar]')!;
+  const events: Evento[] = JSON.parse(root.dataset.events ?? '[]');
+  const withEvents = new Set(events.map((e) => e.d));
+  const grid = root.querySelector<HTMLElement>('[data-cal-grid]')!;
+  const monthEl = root.querySelector<HTMLElement>('[data-cal-month]')!;
+  const listEl = root.querySelector<HTMLElement>('[data-agenda-list]')!;
+  const labelEl = root.querySelector<HTMLElement>('[data-agenda-label]')!;
+  const allBtn = root.querySelector<HTMLButtonElement>('[data-agenda-all]')!;
+  const icons = document.querySelector<HTMLTemplateElement>('#cal-icons')!.content;
+  const icon = (name: string) => icons.querySelector(`[data-icon="${name}"]`)!.innerHTML;
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const keyOf = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
+  const parse = (k: string) => new Date(k + 'T12:00:00');
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  const now = new Date();
+  const today = keyOf(now.getFullYear(), now.getMonth(), now.getDate());
+  let y = now.getFullYear();
+  let m = now.getMonth();
+  let sel: string | null = null;
+
+  function renderGrid() {
+    monthEl.textContent = `${MES[m]} ${y}`;
+    grid.querySelectorAll('.cal__cell').forEach((c) => c.remove());
+    const first = (new Date(y, m, 1).getDay() + 6) % 7;
+    const days = new Date(y, m + 1, 0).getDate();
+    const html: string[] = [];
+    for (let i = 0; i < first; i++) html.push('<span class="cal__cell cal__cell--empty"></span>');
+    for (let d = 1; d <= days; d++) {
+      const k = keyOf(y, m, d);
+      const has = withEvents.has(k);
+      const cls = ['cal__cell', has && 'has-event', k === sel && 'is-selected', k === today && 'is-today'].filter(Boolean).join(' ');
+      html.push(
+        `<button type="button" class="${cls}" data-day="${k}" aria-pressed="${k === sel}" aria-label="${d} de ${MES[m]}${has ? ', con eventos' : ''}">` +
+          `<span class="cal__num">${d}</span><span class="cal__dot"></span></button>`,
+      );
+    }
+    while (html.length % 7) html.push('<span class="cal__cell cal__cell--empty"></span>');
+    grid.insertAdjacentHTML('beforeend', html.join(''));
+  }
+
+  function renderList() {
+    const prefix = `${y}-${pad(m + 1)}`;
+    const list = events.filter((e) => (sel ? e.d === sel : e.d.startsWith(prefix))).sort((a, b) => a.d.localeCompare(b.d));
+    const selD = sel ? parse(sel) : null;
+    labelEl.textContent = selD ? `${DOW[selD.getDay()]} ${selD.getDate()} de ${MES[selD.getMonth()].toLowerCase()}` : 'Este mes';
+    allBtn.hidden = !sel;
+
+    if (!list.length) {
+      const msg = sel
+        ? 'No hay eventos este día. Recuerda que hay Misa diaria a las 08:00 y 19:00.'
+        : 'Aún no hay eventos publicados para este mes.';
+      listEl.innerHTML = `<p class="agenda__empty">${msg}</p>`;
+      return;
+    }
+    listEl.innerHTML = list
+      .map((e) => {
+        const dt = parse(e.d);
+        const badge = e.lit
+          ? `<div><span class="badge"><span class="badge__dot badge__dot--${e.lit}"></span>${LIT[e.lit]}</span></div>`
+          : '';
+        return (
+          `<div class="ev"><div class="ev__date"><span class="ev__num">${dt.getDate()}</span><span class="ev__dow">${DOW[dt.getDay()]}</span></div>` +
+          `<div class="ev__body"><span class="ev__title">${esc(e.t)}</span>` +
+          `<span class="ev__meta"><span>${icon('clock')}${esc(e.h)}</span><span>${icon('map-pin')}${esc(e.l)}</span></span>${badge}</div></div>`
+        );
+      })
+      .join('');
+  }
+
+  function render() {
+    renderGrid();
+    renderList();
+  }
+
+  function go(delta: number) {
+    m += delta;
+    if (m < 0) { m = 11; y--; }
+    if (m > 11) { m = 0; y++; }
+    sel = null;
+    render();
+  }
+
+  root.querySelector('[data-cal-prev]')!.addEventListener('click', () => go(-1));
+  root.querySelector('[data-cal-next]')!.addEventListener('click', () => go(1));
+  allBtn.addEventListener('click', () => { sel = null; render(); });
+  grid.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-day]');
+    if (!btn) return;
+    sel = sel === btn.dataset.day ? null : btn.dataset.day!;
+    render();
+  });
+
+  render();
+</script>
+
+<style>
+  .cal-section { padding: clamp(48px, 9vw, 96px) 0; }
+  .cal-layout {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 clamp(16px, 5vw, 40px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: clamp(40px, 6vw, 72px);
+    align-items: start;
+  }
+
+  .cal { display: flex; flex-direction: column; gap: 20px; }
+  .cal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .cal__month {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--text-heading);
+    text-align: center;
+  }
+  .cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 2px solid var(--text-heading); }
+  .cal__dow {
+    padding: 12px 0;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .cal__grid :global(.cal__cell) {
+    all: unset;
+    box-sizing: border-box;
+    aspect-ratio: 1 / 1;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    font-size: clamp(14px, 2vw, 17px);
+    font-weight: 400;
+    transition: background var(--duration-fast);
+  }
+  .cal__grid :global(button.cal__cell) { cursor: pointer; }
+  .cal__grid :global(button.cal__cell:hover) { background: var(--surface-subtle); }
+  .cal__grid :global(button.cal__cell:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+  .cal__grid :global(.cal__num) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-pill);
+  }
+  .cal__grid :global(.cal__dot) { width: 6px; height: 6px; border-radius: var(--radius-pill); }
+  .cal__grid :global(.has-event) { color: var(--text-heading); font-weight: 700; }
+  .cal__grid :global(.has-event .cal__dot) { background: var(--gold-500); }
+  .cal__grid :global(.is-today .cal__num) { box-shadow: inset 0 0 0 1px var(--gold-500); }
+  .cal__grid :global(.cal__cell.is-selected) { background: var(--surface-inverse); color: #fff; font-weight: 700; }
+  .cal__grid :global(.is-selected .cal__num) { box-shadow: none; }
+
+  .cal__legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--text-muted); }
+  .cal__legend > span { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--gold-500); }
+  .legend-ring { width: 14px; height: 14px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--gold-500); }
+
+  .agenda { display: flex; flex-direction: column; gap: 20px; }
+  .agenda__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .agenda__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+  }
+  .agenda__rule { width: 24px; height: 1px; background: currentColor; }
+  .agenda__all {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-button);
+    text-transform: uppercase;
+    color: var(--navy-800);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-underline-offset: 6px;
+  }
+  .agenda__all:hover { color: var(--gold-700); }
+  .agenda__all:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  .agenda :global(.agenda__empty) { margin: 0; padding: 24px 0; font-size: 16px; line-height: 1.6; color: var(--text-muted); }
+  .agenda :global(.ev) { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border-default); }
+  .agenda :global(.ev__date) { flex: none; width: 56px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .agenda :global(.ev__num) { font-family: var(--font-heading); font-size: 28px; font-weight: 700; line-height: 1; color: var(--text-heading); }
+  .agenda :global(.ev__dow) {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .agenda :global(.ev__body) { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .agenda :global(.ev__title) { font-family: var(--font-heading); font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--text-heading); }
+  .agenda :global(.ev__meta) { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--text-muted); }
+  .agenda :global(.ev__meta > span) { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Badge (liturgical color) from the design system */
+  .agenda :global(.badge) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--radius-xs);
+    background: var(--white);
+    color: var(--stone-700);
+    border: 1px solid var(--border-default);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .agenda :global(.badge__dot) { width: 8px; height: 8px; border-radius: 50%; }
+  .agenda :global(.badge__dot--blanco) { background: var(--lit-white); box-shadow: inset 0 0 0 1px var(--stone-300); }
+  .agenda :global(.badge__dot--verde) { background: var(--lit-green); }
+  .agenda :global(.badge__dot--morado) { background: var(--lit-purple); }
+  .agenda :global(.badge__dot--rojo) { background: var(--lit-red); }
+  .agenda :global(.badge__dot--rosa) { background: var(--lit-rose); }
+</style>

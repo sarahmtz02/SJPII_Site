@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Icon from '../components/ds/Icon.astro';
+import Button from '../components/ds/Button.astro';
+import Input from '../components/ds/Input.astro';
+import Checkbox from '../components/ds/Checkbox.astro';
+import { parish, routes } from '../data/site';
+
+const pasos = [
+  { i: 'church', t: 'En la Misa del domingo', d: 'Presentamos las intenciones de la semana durante la oración de los fieles.' },
+  { i: 'users', t: 'Con el grupo de oración', d: 'Cada martes a las 19:30 en la capilla, oramos por cada nombre e intención recibida.' },
+  { i: 'lock', t: 'Con discreción', d: 'Nada de lo que compartas se publica. Si lo prefieres, no necesitas dejar tu nombre.' },
+];
+---
+<BaseLayout
+  title="Oración · Parroquia San Juan Pablo II"
+  description="Comparte tu intención y la comunidad de la Parroquia San Juan Pablo II orará por ti."
+  active="oracion"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Peticiones de oración"
+    title="No tienes que cargarlo solo"
+    lead="Comparte tu intención y nuestra comunidad orará por ti. Puedes hacerlo con tu nombre o de forma anónima."
+    photoLabel="Foto: Velas encendidas en la capilla"
+  />
+
+  <section class="form-section">
+    <div class="container split" style="--split-min: 360px">
+      <div class="info">
+        <SectionHeading size="sm" eyebrow="Cómo oramos" title="Tu intención llega a la comunidad" />
+        <div class="rule-list">
+          {pasos.map((p) => (
+            <div class="feature-row">
+              <Icon name={p.i} size={22} color="var(--gold-600)" />
+              <div class="feature-row__text">
+                <span class="feature-row__title">{p.t}</span>
+                <span class="feature-row__desc">{p.d}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p class="note">Si necesitas hablar con alguien hoy, llama al despacho al {parish.phone}. En una emergencia, comunícate al 911.</p>
+      </div>
+
+      <div class="panel" data-prayer-panel>
+        <form class="form-stack" data-prayer-form novalidate>
+          <h2 class="panel__title">Comparte tu intención</h2>
+          <Input label="Tu intención" name="intencion" multiline rows={6} placeholder="Escribe por quién o por qué quieres que oremos" />
+          <Checkbox label="Prefiero que sea anónima" name="anonima" />
+          <div data-show="nombre">
+            <Input label="Tu nombre" name="nombre" placeholder="Nombre" autocomplete="name" />
+          </div>
+          <Checkbox label="Me gustaría que un sacerdote me contacte" name="contacto" />
+          <div data-show="medio" hidden>
+            <Input label="Teléfono o correo" name="medio" icon="phone" placeholder="Para que podamos buscarte" />
+          </div>
+          <p class="form-alert" data-form-alert hidden>No pudimos enviar tu intención. Intenta de nuevo o llámanos al {parish.phone}.</p>
+          <Button variant="accent" size="lg" type="submit" fullWidth>Enviar intención</Button>
+          <span class="privacy">Tu intención solo la leen el equipo de oración y los sacerdotes.</span>
+        </form>
+
+        <div class="success" data-prayer-success hidden>
+          <span class="success__icon"><Icon name="hand-heart" size={26} /></span>
+          <h2 class="success__title success__title--lg" tabindex="-1">Gracias. Recibimos tu intención. Oraremos por ti.</h2>
+          <p class="success__text" data-success-text></p>
+          <div class="success__actions">
+            <Button variant="secondary" data-prayer-reset>Compartir otra intención</Button>
+            <Button variant="link" iconRight="arrow-right" href={routes.horarios}>Horarios de Misa</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { sendForm, setFieldError, value } from '../lib/forms';
+
+  const panel = document.querySelector<HTMLElement>('[data-prayer-panel]')!;
+  const form = panel.querySelector<HTMLFormElement>('[data-prayer-form]')!;
+  const success = panel.querySelector<HTMLElement>('[data-prayer-success]')!;
+  const alertEl = form.querySelector<HTMLElement>('[data-form-alert]')!;
+  const anonima = form.elements.namedItem('anonima') as HTMLInputElement;
+  const contacto = form.elements.namedItem('contacto') as HTMLInputElement;
+  let tried = false;
+
+  // "Anónima" hides the name field; "contacto" reveals the phone/email field.
+  function syncToggles() {
+    form.querySelector<HTMLElement>('[data-show="nombre"]')!.hidden = anonima.checked;
+    form.querySelector<HTMLElement>('[data-show="medio"]')!.hidden = !contacto.checked;
+  }
+
+  function validate() {
+    const errI = value(form, 'intencion') ? undefined : 'Escribe tu intención para poder enviarla.';
+    const errM = contacto.checked && !value(form, 'medio') ? 'Déjanos un teléfono o correo para buscarte.' : undefined;
+    setFieldError(form, 'intencion', errI);
+    setFieldError(form, 'medio', errM);
+    return !errI && !errM;
+  }
+
+  form.addEventListener('change', syncToggles);
+  form.addEventListener('input', () => tried && validate());
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    tried = true;
+    if (!validate()) return;
+    alertEl.hidden = true;
+    const nombre = anonima.checked ? '' : value(form, 'nombre');
+    try {
+      await sendForm('oracion', {
+        intencion: value(form, 'intencion'),
+        anonima: anonima.checked,
+        nombre,
+        quiereContacto: contacto.checked,
+        medio: contacto.checked ? value(form, 'medio') : '',
+      });
+    } catch {
+      alertEl.hidden = false;
+      return;
+    }
+    const first = nombre.split(' ')[0];
+    success.querySelector('[data-success-text]')!.textContent =
+      (first ? `${first}, tu` : 'Tu') +
+      ' intención se presentará en la Misa del domingo y en el grupo de oración del martes.' +
+      (contacto.checked ? ' Un sacerdote se comunicará contigo en los próximos días.' : '');
+    form.hidden = true;
+    success.hidden = false;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    success.querySelector<HTMLElement>('.success__title')!.focus({ preventScroll: true });
+  });
+
+  success.querySelector('[data-prayer-reset]')!.addEventListener('click', () => {
+    form.reset();
+    tried = false;
+    setFieldError(form, 'intencion');
+    setFieldError(form, 'medio');
+    syncToggles();
+    success.hidden = true;
+    form.hidden = false;
+  });
+</script>
+
+<style>
+  .form-section { padding: clamp(48px, 9vw, 96px) 0; }
+  .split { align-items: start; }
+  .info { display: flex; flex-direction: column; gap: 32px; }
+  .panel { scroll-margin-top: calc(var(--header-h) + 16px); }
+  .privacy { font-size: 13px; line-height: 1.5; color: var(--text-subtle); }
+  .success { gap: 20px; }
+  .success__title--lg { font-size: 28px; }
+  .success__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+</style>

@@ -1,0 +1,27 @@
+---
+// Navy band with a short heading and one call to action.
+import SectionHeading from './ds/SectionHeading.astro';
+import Button from './ds/Button.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  cta: string;
+  href: string;
+  icon?: string;
+  iconRight?: string;
+}
+
+const { eyebrow, title, cta, href, icon, iconRight } = Astro.props;
+---
+<section class="cta-band">
+  <div class="container cta-band__inner">
+    <SectionHeading inverse size="sm" eyebrow={eyebrow} title={title} />
+    <Button variant="accent" href={href} icon={icon} iconRight={iconRight}>{cta}</Button>
+  </div>
+</section>
+
+<style>
+  .cta-band { background: var(--surface-inverse); padding: clamp(56px, 9vw, 80px) 0; }
+  .cta-band__inner { display: flex; flex-wrap: wrap; gap: 32px; justify-content: space-between; align-items: center; }
+</style>

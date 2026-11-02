@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Button from '../components/ds/Button.astro';
+import Icon from '../components/ds/Icon.astro';
+import { parish, routes, telHref } from '../data/site';
+
+const sacramentos = [
+  {
+    id: 'bautismo',
+    t: 'Bautismo',
+    d: 'El inicio de la vida cristiana. Pláticas prebautismales el primer sábado de cada mes.',
+    req: ['Acta de nacimiento del niño', 'Constancia de pláticas de padres y padrinos', 'Padrinos confirmados y, si son pareja, casados por la Iglesia'],
+    paso: 'Aparta fecha en el despacho con al menos un mes de anticipación e inscríbete a las pláticas.',
+  },
+  {
+    id: 'comunion',
+    t: 'Primera Comunión',
+    d: 'Dos ciclos de catequesis para niños a partir de 8 años.',
+    req: ['Fe de bautismo', 'Inscripción en catequesis', 'Asistencia a la Misa dominical'],
+    paso: 'Las inscripciones a catequesis abren en agosto. Acude al despacho con la fe de bautismo.',
+  },
+  {
+    id: 'confirmacion',
+    t: 'Confirmación',
+    d: 'Preparación para adolescentes, jóvenes y adultos.',
+    req: ['Fe de bautismo', 'Constancia de Primera Comunión', 'Curso de preparación'],
+    paso: 'Pregunta en el despacho por el próximo grupo de preparación según tu edad.',
+  },
+  {
+    id: 'matrimonio',
+    t: 'Matrimonio',
+    d: 'Acompañamos a los novios desde seis meses antes de la boda.',
+    req: ['Fe de bautismo y confirmación de ambos', 'Pláticas prematrimoniales', 'Presentación matrimonial en el despacho'],
+    paso: 'Agenda una primera cita con el párroco para conocerlos y apartar la fecha.',
+  },
+  {
+    id: 'uncion',
+    t: 'Unción de los enfermos',
+    d: 'Un sacerdote puede visitar a tu familiar en casa o en el hospital.',
+    req: ['Llamar al despacho parroquial', 'En urgencia, al teléfono de guardia'],
+    paso: 'Llama al despacho en horario de oficina o, si es urgente, al teléfono de guardia.',
+  },
+];
+---
+<BaseLayout
+  title="Sacramentos · Parroquia San Juan Pablo II"
+  description="Requisitos y pasos para Bautismo, Primera Comunión, Confirmación, Matrimonio y Unción de los enfermos."
+  active="sacramentos"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Sacramentos"
+    title="Te acompañamos en cada paso"
+    lead="Aquí encontrarás qué necesitas para cada sacramento. Si tienes dudas, el despacho parroquial te orienta con gusto."
+    photoLabel="Foto: Celebración de un Bautismo"
+  />
+
+  <section class="section">
+    <div class="narrow">
+      <div class="rule-list">
+        {sacramentos.map((s, i) => (
+          <details class="sac" id={s.id} name="sacramentos" open={i === 0}>
+            <summary class="sac__head">
+              <span class="sac__text">
+                <span class="sac__title">{s.t}</span>
+                <span class="sac__desc">{s.d}</span>
+              </span>
+              <span class="sac__toggle" aria-hidden="true"><Icon name="plus" size={18} /></span>
+            </summary>
+            <div class="sac__body">
+              <div class="sac__req">
+                <span class="eyebrow-sm">Requisitos</span>
+                {s.req.map((r) => (
+                  <div class="sac__item">
+                    <Icon name="check" size={18} color="var(--gold-600)" class="sac__check" />
+                    <span>{r}</span>
+                  </div>
+                ))}
+              </div>
+              <div class="sac__next">
+                <span class="eyebrow-sm">Siguiente paso</span>
+                <p>{s.paso}</p>
+                <div><Button variant="primary" size="sm" href={`${routes.nosotros}#contacto`}>Contactar al despacho</Button></div>
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Unción de los enfermos"
+    title="¿Un familiar está grave? Llama al teléfono de guardia."
+    cta={parish.emergencyPhone}
+    icon="phone"
+    href={telHref(parish.emergencyPhone)}
+  />
+</BaseLayout>
+
+<script>
+  // Open the sacrament named in the URL hash (e.g. /sacramentos#matrimonio).
+  const target = location.hash && document.querySelector<HTMLDetailsElement>(`details${CSS.escape(location.hash)}`);
+  if (target) target.open = true;
+</script>
+
+<style>
+  .narrow { max-width: 960px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px); }
+
+  .sac { border-bottom: 1px solid var(--border-default); scroll-margin-top: var(--header-h); }
+  .sac__head {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 0;
+    min-height: 56px;
+  }
+  .sac__head::-webkit-details-marker { display: none; }
+  .sac__text { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .sac__title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-heading);
+    line-height: 1.2;
+  }
+  .sac__desc { font-size: 16px; line-height: 1.6; color: var(--text-muted); text-wrap: pretty; }
+  .sac__toggle {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-heading);
+    transition: transform var(--duration-base) var(--ease-standard), background var(--duration-fast);
+  }
+  .sac__head:hover .sac__toggle { background: var(--ivory); }
+  .sac[open] .sac__toggle { transform: rotate(45deg); }
+
+  .sac__body {
+    padding: 0 0 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 32px;
+  }
+  .sac__req { display: flex; flex-direction: column; gap: 14px; }
+  .sac__item { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; line-height: 1.5; color: var(--text-body); }
+  .sac :global(.sac__check) { margin-top: 3px; }
+  .sac__next {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    background: var(--surface-subtle);
+    border-top: 2px solid var(--gold-500);
+    border-radius: var(--radius-sm);
+  }
+  .sac__next p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text-body); }
+</style>

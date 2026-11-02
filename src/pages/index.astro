@@ -6,6 +6,9 @@ import Card from '../components/ds/Card.astro';
 import Button from '../components/ds/Button.astro';
 import Icon from '../components/ds/Icon.astro';
 import { parish, routes } from '../data/site';
+import { misasDomingo } from '../data/horarios';
+import { grupos } from '../data/grupos';
+import { destacados } from '../data/eventos';
 
 const quickFacts = [
   { icon: 'clock', label: 'Próxima Misa', value: 'Hoy, 19:00' },
@@ -13,24 +16,6 @@ const quickFacts = [
   { icon: 'phone', label: 'Despacho parroquial', value: parish.phone },
 ];
 
-const domingo = [
-  { h: '08:00', t: 'Misa' },
-  { h: '10:00', t: 'Misa con niños' },
-  { h: '12:00', t: 'Misa' },
-  { h: '19:00', t: 'Misa con jóvenes' },
-];
-
-const grupos = [
-  { t: 'Pastoral Juvenil', e: 'Jóvenes', d: 'Viernes 19:30, salón parroquial.' },
-  { t: 'Matrimonios', e: 'Familias', d: 'Un sábado al mes, 18:00.' },
-  { t: 'Catequesis infantil', e: 'Niños', d: 'Sábados 10:00 a 12:00.' },
-  { t: 'Coro parroquial', e: 'Liturgia', d: 'Ensayos los jueves 20:00.' },
-];
-
-const eventos = [
-  { t: 'Retiro de Adviento', f: 'Sáb 28 nov · 09:00', l: 'Salón parroquial' },
-  { t: 'Posadas parroquiales', f: '16 – 24 dic · 19:30', l: 'Atrio del templo' },
-];
 ---
 <BaseLayout
   title="Inicio · Parroquia San Juan Pablo II"
@@ -73,7 +58,7 @@ const eventos = [
         lead="Cada domingo nos reunimos como familia. Si es tu primera vez, llega unos minutos antes: alguien del equipo de bienvenida te recibirá en la entrada."
       />
       <div class="schedule">
-        {domingo.map((m) => (
+        {misasDomingo.map((m) => (
           <div class="schedule__row">
             <span class="schedule__time">{m.h}</span>
             <span class="schedule__what">Domingo · {m.t}</span>
@@ -95,8 +80,8 @@ const eventos = [
         lead="Grupos para cada etapa de la vida. Nadie tiene que caminar solo."
       />
       <div class="comunidad__grid">
-        {grupos.map((g) => (
-          <Card imageLabel={`Foto: ${g.t}`} eyebrow={g.e} title={g.t} description={g.d} href={routes.comunidad} />
+        {grupos.slice(0, 4).map((g) => (
+          <Card image={g.img} imageLabel={`Foto: ${g.t}`} eyebrow={g.e} title={g.t} description={g.d} href={routes.comunidad} />
         ))}
       </div>
       <div class="comunidad__more">
@@ -112,7 +97,7 @@ const eventos = [
         <Button variant="secondary" icon="calendar" href={routes.eventos}>Ver calendario</Button>
       </div>
       <div class="eventos__grid">
-        {eventos.map((e) => (
+        {destacados.map((e) => (
           <Card variant="overlay" aspect="16/9" imageLabel={`Foto: ${e.t}`} eyebrow={e.f} title={e.t} description={e.l} href={routes.eventos} />
         ))}
       </div>

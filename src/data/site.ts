@@ -36,7 +36,19 @@ export const parish = {
   city: 'Corregidora, Querétaro',
   address: 'Av. Ejemplo 123, Col. Centro',
   phone: '442 000 0000',
+  /** Teléfono de guardia para la Unción de los enfermos. */
+  emergencyPhone: '442 000 0001',
+  email: 'contacto@parroquiasjpii.mx',
   officeHours: ['Lun a Vie 10:00 – 14:00 y 16:00 – 19:00', 'Sáb 10:00 – 13:00'],
   social: { facebook: '#', instagram: '#', youtube: '#' },
   liveStream: '#',
+  bank: {
+    name: 'Banco Ejemplo',
+    holder: 'Parroquia San Juan Pablo II, A.R.',
+    clabe: '000 000 0000 0000 0000',
+    reference: 'DONATIVO + tu nombre',
+  },
 };
+
+/** "442 000 0000" → "tel:4420000000" */
+export const telHref = (phone: string) => 'tel:' + phone.replace(/\D/g, '');

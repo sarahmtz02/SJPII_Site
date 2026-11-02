@@ -1,0 +1,512 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Icon from '../components/ds/Icon.astro';
+import Button from '../components/ds/Button.astro';
+import Input from '../components/ds/Input.astro';
+import Select from '../components/ds/Select.astro';
+import Radio from '../components/ds/Radio.astro';
+import { parish } from '../data/site';
+
+const destinos = [
+  { i: 'church', t: 'Sostenimiento del templo', d: 'Luz, agua, mantenimiento y lo necesario para celebrar cada día.' },
+  { i: 'hand-heart', t: 'Cáritas parroquial', d: 'Despensas, medicamentos y acompañamiento a familias de la colonia.' },
+  { i: 'hammer', t: 'Obras de construcción', d: 'Terminación del salón parroquial y la capilla del Santísimo.' },
+];
+const destinoOpts = destinos.map((d) => d.t);
+const montos = [100, 200, 500, 1000];
+const steps = ['Monto', 'Tus datos', 'Listo'];
+const banco = [
+  { k: 'Banco', v: parish.bank.name },
+  { k: 'Titular', v: parish.bank.holder },
+  { k: 'CLABE', v: parish.bank.clabe },
+  { k: 'Referencia', v: parish.bank.reference },
+];
+---
+<BaseLayout
+  title="Donativos · Parroquia San Juan Pablo II"
+  description="Apoya a la Parroquia San Juan Pablo II con un donativo en línea o por transferencia."
+  active="donativos"
+  headerOverHero
+>
+  <PageHero
+    eyebrow="Donativos"
+    title="Tu generosidad sostiene a la comunidad"
+    lead="Con tu donativo mantenemos el templo abierto, acompañamos a las familias que más lo necesitan y seguimos construyendo nuestra casa común."
+    photoLabel="Foto: Obras del templo parroquial"
+  />
+
+  <section class="form-section">
+    <div class="container split" style="--split-min: 360px">
+      <div class="info">
+        <SectionHeading size="sm" eyebrow="A dónde va tu donativo" title="Cada aportación tiene un destino claro" />
+        <div class="rule-list">
+          {destinos.map((d) => (
+            <div class="feature-row">
+              <Icon name={d.i} size={22} color="var(--gold-600)" />
+              <div class="feature-row__text">
+                <span class="feature-row__title">{d.t}</span>
+                <span class="feature-row__desc">{d.d}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p class="note">También puedes dejar tu donativo en la colecta de cada Misa o directamente en el despacho parroquial.</p>
+      </div>
+
+      <div class="panel donate" data-donate>
+        <div class="tabs" role="tablist" aria-label="Forma de donar">
+          <button type="button" role="tab" id="tab-online" class="tab" aria-selected="true" aria-controls="panel-online" data-tab="online">Donar en línea</button>
+          <button type="button" role="tab" id="tab-transfer" class="tab" aria-selected="false" aria-controls="panel-transfer" data-tab="transfer" tabindex="-1">Transferencia</button>
+        </div>
+
+        <!-- Donar en línea -->
+        <div id="panel-online" role="tabpanel" aria-labelledby="tab-online" class="tabpanel">
+          <ol class="steps" data-steps>
+            {steps.map((l, i) => (
+              <li class="step" data-step-n={i + 1}>
+                <span class="step__num">{i + 1}</span>{l}
+                {i < steps.length - 1 && <span class="step__sep" aria-hidden="true" />}
+              </li>
+            ))}
+          </ol>
+
+          <form class="form-stack" data-step="1" novalidate>
+            <Select label="Destino" name="destino" options={destinoOpts} />
+            <div class="amount">
+              <span class="group-label" id="monto-label">Monto</span>
+              <div class="amount__grid" role="group" aria-labelledby="monto-label">
+                {montos.map((v) => (
+                  <button type="button" class="amount__btn" data-amount={v} aria-pressed={v === 200 ? 'true' : 'false'}>
+                    ${v.toLocaleString('es-MX')}
+                  </button>
+                ))}
+              </div>
+              <Input name="otro" placeholder="Otro monto (MXN)" inputmode="numeric" aria-label="Otro monto (MXN)" />
+            </div>
+            <div class="freq">
+              <span class="group-label">Frecuencia</span>
+              <Radio name="frecuencia" label="Frecuencia" direction="row" options={['Una sola vez', 'Mensual']} value="Una sola vez" />
+            </div>
+            <Button variant="accent" size="lg" type="submit" fullWidth iconRight="arrow-right">Continuar</Button>
+          </form>
+
+          <form class="form-stack" data-step="2" novalidate hidden>
+            <div class="summary">
+              <div class="summary__text">
+                <span class="summary__dest" data-summary-dest></span>
+                <span class="summary__amount" data-amount-label></span>
+              </div>
+              <button type="button" class="link-btn" data-back>Cambiar</button>
+            </div>
+            <Input label="Nombre completo" name="nombre" autocomplete="name" />
+            <Input label="Correo electrónico" name="correo" type="email" icon="mail" hint="Te enviaremos el comprobante." autocomplete="email" />
+            <p class="form-alert" data-form-alert hidden>No pudimos procesar tu donativo. Intenta de nuevo o llámanos al {parish.phone}.</p>
+            <div class="pay-row">
+              <Button variant="secondary" size="lg" icon="arrow-left" data-back>Atrás</Button>
+              <Button variant="accent" size="lg" type="submit" icon="lock" class="pay-row__pay">Donar <span data-amount-label></span></Button>
+            </div>
+            <span class="fine">Serás dirigido a una plataforma de pago segura.</span>
+          </form>
+
+          <div class="success" data-step="3" hidden>
+            <span class="success__icon"><Icon name="heart" size={26} /></span>
+            <h2 class="success__title success__title--lg" data-done-title tabindex="-1"></h2>
+            <p class="success__text" data-done-text></p>
+            <span class="fine" data-done-folio></span>
+            <Button variant="secondary" data-restart>Hacer otro donativo</Button>
+          </div>
+        </div>
+
+        <!-- Transferencia -->
+        <div id="panel-transfer" role="tabpanel" aria-labelledby="tab-transfer" class="tabpanel transfer" hidden>
+          <dl class="rule-list bank">
+            {banco.map((b) => (
+              <div class="bank__row">
+                <dt class="bank__key">{b.k}</dt>
+                <dd class="bank__value">{b.v}</dd>
+              </div>
+            ))}
+          </dl>
+          <div>
+            <Button variant="secondary" size="sm" data-copy={parish.bank.clabe.replace(/\D/g, '')} aria-live="polite">
+              <span class="copy-state" data-copy-idle><Icon name="copy" size={14} />Copiar CLABE</span>
+              <span class="copy-state" data-copy-done hidden><Icon name="check" size={14} />CLABE copiada</span>
+            </Button>
+          </div>
+
+          <form class="form-stack transfer__form" data-transfer-form novalidate>
+            <div class="transfer__intro">
+              <h3>Avísanos de tu transferencia</h3>
+              <p>Así podemos identificarla y enviarte tu comprobante.</p>
+            </div>
+            <Input label="Nombre completo" name="tNombre" id="t-nombre" autocomplete="name" />
+            <Input label="Correo electrónico" name="tCorreo" id="t-correo" type="email" autocomplete="email" />
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr))">
+              <Input label="Monto (MXN)" name="tMonto" id="t-monto" inputmode="numeric" />
+              <Input label="Fecha" name="tFecha" id="t-fecha" type="date" />
+            </div>
+            <Select label="Destino" name="tDestino" id="t-destino" options={destinoOpts} />
+            <p class="form-alert" data-form-alert hidden>No pudimos enviar tu aviso. Intenta de nuevo o llámanos al {parish.phone}.</p>
+            <Button variant="primary" size="lg" type="submit" fullWidth>Enviar aviso</Button>
+          </form>
+
+          <div class="transfer__done" data-transfer-done hidden>
+            <span class="transfer__done-title"><Icon name="check" size={20} color="var(--status-success)" />Recibimos tu aviso</span>
+            <p data-transfer-done-text></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { isEmail, sendForm, setFieldError, value } from '../lib/forms';
+
+  const root = document.querySelector<HTMLElement>('[data-donate]')!;
+
+  /* Tabs */
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  function selectTab(tab: HTMLButtonElement) {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+    }
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => selectTab(t));
+    t.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      selectTab(next);
+      next.focus();
+    });
+  });
+
+  /* Donar en línea: 3 pasos */
+  const step1 = root.querySelector<HTMLFormElement>('form[data-step="1"]')!;
+  const step2 = root.querySelector<HTMLFormElement>('form[data-step="2"]')!;
+  const step3 = root.querySelector<HTMLElement>('[data-step="3"]')!;
+  const stepEls = [...root.querySelectorAll<HTMLElement>('[data-step-n]')];
+  const amountBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-amount]')];
+  const otro = step1.elements.namedItem('otro') as HTMLInputElement;
+  let monto = 200;
+  let tried1 = false;
+  let tried2 = false;
+
+  const fmt = (n: number) => '$' + n.toLocaleString('es-MX') + ' MXN';
+  const amount = () => (otro.value.trim() ? parseInt(otro.value.replace(/\D/g, ''), 10) || 0 : monto);
+  const freq = () => (step1.querySelector<HTMLInputElement>('input[name="frecuencia"]:checked')?.value ?? 'Una sola vez');
+  const destino = () => value(step1, 'destino');
+  const amountLabel = () => fmt(amount()) + (freq() === 'Mensual' ? ' al mes' : '');
+
+  function showStep(n: 1 | 2 | 3) {
+    step1.hidden = n !== 1;
+    step2.hidden = n !== 2;
+    step3.hidden = n !== 3;
+    stepEls.forEach((el, i) => {
+      el.classList.toggle('is-current', i + 1 === n);
+      el.classList.toggle('is-done', i + 1 < n);
+      if (i + 1 === n) el.setAttribute('aria-current', 'step');
+      else el.removeAttribute('aria-current');
+    });
+    if (n === 2) {
+      root.querySelector('[data-summary-dest]')!.textContent = destino() + (freq() === 'Mensual' ? ' · mensual' : ' · una sola vez');
+      root.querySelectorAll('[data-amount-label]').forEach((el) => (el.textContent = amountLabel()));
+    }
+  }
+
+  function syncAmounts() {
+    const custom = !!otro.value.trim();
+    amountBtns.forEach((b) => b.setAttribute('aria-pressed', String(!custom && Number(b.dataset.amount) === monto)));
+  }
+
+  const validate1 = () => {
+    const err = amount() < 20 ? 'El monto mínimo es $20 MXN.' : undefined;
+    setFieldError(step1, 'otro', err);
+    return !err;
+  };
+  const validate2 = () => {
+    const errN = value(step2, 'nombre') ? undefined : 'Escribe tu nombre.';
+    const errC = isEmail(value(step2, 'correo')) ? undefined : 'Revisa tu correo.';
+    setFieldError(step2, 'nombre', errN);
+    setFieldError(step2, 'correo', errC);
+    return !errN && !errC;
+  };
+
+  amountBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      monto = Number(b.dataset.amount);
+      otro.value = '';
+      syncAmounts();
+      if (tried1) validate1();
+    }),
+  );
+  otro.addEventListener('input', () => {
+    syncAmounts();
+    if (tried1) validate1();
+  });
+  step1.addEventListener('submit', (e) => {
+    e.preventDefault();
+    tried1 = true;
+    if (validate1()) showStep(2);
+  });
+
+  root.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => showStep(1)));
+  step2.addEventListener('input', () => tried2 && validate2());
+  step2.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    tried2 = true;
+    if (!validate2()) return;
+    const alertEl = step2.querySelector<HTMLElement>('[data-form-alert]')!;
+    alertEl.hidden = true;
+    const folio = 'DON-' + Math.floor(100000 + Math.random() * 900000);
+    // TODO: redirigir a la pasarela de pago (p. ej. Stripe, Mercado Pago o Conekta) antes de confirmar.
+    try {
+      await sendForm('donativo', { folio, destino: destino(), monto: amount(), frecuencia: freq(), nombre: value(step2, 'nombre'), correo: value(step2, 'correo') });
+    } catch {
+      alertEl.hidden = false;
+      return;
+    }
+    const d = destino();
+    root.querySelector('[data-done-title]')!.textContent = `Gracias por tu generosidad, ${value(step2, 'nombre').split(' ')[0]}.`;
+    root.querySelector('[data-done-text]')!.textContent =
+      `Recibimos tu donativo de ${amountLabel()} para ${d.charAt(0).toLowerCase() + d.slice(1)}. Enviamos el comprobante a ${value(step2, 'correo')}.`;
+    root.querySelector('[data-done-folio]')!.textContent = `Folio ${folio}`;
+    showStep(3);
+    root.querySelector<HTMLElement>('[data-done-title]')!.focus();
+  });
+
+  root.querySelector('[data-restart]')!.addEventListener('click', () => {
+    monto = 200;
+    otro.value = '';
+    tried1 = tried2 = false;
+    setFieldError(step1, 'otro');
+    syncAmounts();
+    showStep(1);
+  });
+
+  showStep(1);
+
+  /* Transferencia */
+  const copyBtn = root.querySelector<HTMLElement>('[data-copy]')!;
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(copyBtn.dataset.copy!);
+    } catch {
+      return;
+    }
+    copyBtn.querySelector<HTMLElement>('[data-copy-idle]')!.hidden = true;
+    copyBtn.querySelector<HTMLElement>('[data-copy-done]')!.hidden = false;
+    setTimeout(() => {
+      copyBtn.querySelector<HTMLElement>('[data-copy-idle]')!.hidden = false;
+      copyBtn.querySelector<HTMLElement>('[data-copy-done]')!.hidden = true;
+    }, 2000);
+  });
+
+  const tForm = root.querySelector<HTMLFormElement>('[data-transfer-form]')!;
+  let tTried = false;
+  const validateT = () => {
+    const errors = {
+      tNombre: value(tForm, 'tNombre') ? undefined : 'Escribe tu nombre.',
+      tCorreo: isEmail(value(tForm, 'tCorreo')) ? undefined : 'Revisa tu correo.',
+      tMonto: value(tForm, 'tMonto') ? undefined : 'Indica el monto.',
+    };
+    for (const [k, msg] of Object.entries(errors)) setFieldError(tForm, k, msg);
+    return Object.values(errors).every((e) => !e);
+  };
+  tForm.addEventListener('input', () => tTried && validateT());
+  tForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    tTried = true;
+    if (!validateT()) return;
+    const alertEl = tForm.querySelector<HTMLElement>('[data-form-alert]')!;
+    alertEl.hidden = true;
+    try {
+      await sendForm('aviso-transferencia', {
+        nombre: value(tForm, 'tNombre'),
+        correo: value(tForm, 'tCorreo'),
+        monto: value(tForm, 'tMonto'),
+        fecha: value(tForm, 'tFecha'),
+        destino: value(tForm, 'tDestino'),
+      });
+    } catch {
+      alertEl.hidden = false;
+      return;
+    }
+    root.querySelector('[data-transfer-done-text]')!.textContent =
+      `Gracias. En cuanto identifiquemos tu transferencia te enviaremos el comprobante a ${value(tForm, 'tCorreo')}.`;
+    tForm.hidden = true;
+    root.querySelector<HTMLElement>('[data-transfer-done]')!.hidden = false;
+  });
+</script>
+
+<style>
+  .form-section { padding: clamp(48px, 9vw, 96px) 0; }
+  .split { align-items: start; }
+  .info { display: flex; flex-direction: column; gap: 32px; }
+  .donate { display: flex; flex-direction: column; gap: 28px; }
+
+  .tabs { display: flex; gap: 32px; flex-wrap: wrap; border-bottom: 1px solid var(--border-default); }
+  .tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0 0 14px;
+    margin-bottom: -1px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-button);
+    text-transform: uppercase;
+    color: var(--stone-500);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+  }
+  .tab:hover { color: var(--navy-800); }
+  .tab[aria-selected='true'] { color: var(--navy-800); border-bottom-color: var(--gold-500); }
+  .tabpanel { display: flex; flex-direction: column; gap: 24px; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .step__num {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-muted);
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+  .step__sep { width: 16px; height: 1px; background: var(--border-strong); }
+  .step.is-current, .step.is-done { color: var(--text-heading); }
+  .step.is-current .step__num { background: var(--gold-500); color: var(--navy-900); }
+  .step.is-done .step__num { background: var(--surface-inverse); color: #fff; }
+
+  .form-stack { gap: 22px; }
+  .group-label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+  }
+  .amount { display: flex; flex-direction: column; gap: 10px; }
+  .amount__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .amount__btn {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border-strong);
+    color: var(--text-heading);
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    transition: all var(--duration-fast);
+  }
+  .amount__btn:hover { border-color: var(--navy-800); }
+  .amount__btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+  .amount__btn[aria-pressed='true'] { background: var(--navy-800); border-color: var(--navy-800); color: #fff; }
+  .freq { display: flex; flex-direction: column; gap: 12px; }
+
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface-subtle);
+    border-radius: var(--radius-xs);
+  }
+  .summary__text { display: flex; flex-direction: column; gap: 2px; }
+  .summary__dest { font-size: 13px; color: var(--text-muted); }
+  .summary__amount { font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--text-heading); }
+  .link-btn {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-button);
+    text-transform: uppercase;
+    color: var(--navy-800);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-underline-offset: 6px;
+  }
+  .link-btn:hover { color: var(--gold-700); }
+  .link-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  .pay-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .pay-row :global(.pay-row__pay) { flex: 1; }
+  .fine { font-size: 13px; line-height: 1.5; color: var(--text-subtle); }
+  .success__title--lg { font-size: 28px; }
+
+  .transfer { gap: 28px; }
+  .bank { margin: 0; }
+  .bank__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .bank__key {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .bank__value { margin: 0; font-size: 16px; font-weight: 500; color: var(--text-heading); font-variant-numeric: tabular-nums; }
+  .copy-state { display: inline-flex; align-items: center; gap: 10px; }
+
+  .transfer__form { gap: 18px; padding-top: 8px; border-top: 1px solid var(--border-subtle); }
+  .transfer__intro { display: flex; flex-direction: column; gap: 6px; }
+  .transfer__intro h3 { margin: 0; font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: var(--text-heading); }
+  .transfer__intro p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .transfer__done {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    background: var(--surface-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .transfer__done-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+  .transfer__done p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+</style>
