@@ -1,0 +1,112 @@
+---
+// Full-bleed photo hero ("Foto a sangre", the design's default hero style).
+import Photo from './ds/Photo.astro';
+import Button from './ds/Button.astro';
+
+interface Props {
+  size?: 'home' | 'page';
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  photo?: string;
+  photoLabel?: string;
+  cta1?: string;
+  cta1Href?: string;
+  cta2?: string;
+  cta2Href?: string;
+  cta2Icon?: string;
+}
+
+const {
+  size = 'page',
+  eyebrow,
+  title,
+  lead,
+  photo,
+  photoLabel = 'Foto',
+  cta1,
+  cta1Href,
+  cta2,
+  cta2Href,
+  cta2Icon,
+} = Astro.props;
+---
+<div class:list={['hero', `hero--${size}`]}>
+  <div class="hero__photo">
+    <Photo src={photo} label={photoLabel} aspect="auto" overlay class="hero__fill" />
+  </div>
+  <div class="hero__scrim" />
+  <div class="hero__content">
+    <span class="hero__eyebrow">{eyebrow}</span>
+    <h1 class="hero__title">{title}</h1>
+    {lead && <p class="hero__lead">{lead}</p>}
+    {cta1 && (
+      <div class="hero__ctas">
+        <Button variant="accent" size="lg" iconRight="arrow-right" href={cta1Href}>{cta1}</Button>
+        {cta2 && <Button variant="inverse" size="lg" icon={cta2Icon} href={cta2Href}>{cta2}</Button>}
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .hero {
+    position: relative;
+    height: min(62vh, 540px);
+    min-height: 420px;
+    background: var(--navy-800);
+    overflow: hidden;
+  }
+  .hero--home { height: min(88vh, 760px); }
+
+  .hero__photo { position: absolute; inset: 0; }
+  .hero :global(.hero__fill) { width: 100%; height: 100%; }
+  .hero__scrim { position: absolute; inset: 0; background: rgba(7, 18, 29, .38); }
+
+  .hero__content {
+    position: relative;
+    height: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: calc(var(--header-h) + 32px) clamp(20px, 5vw, 40px) clamp(40px, 7vw, 72px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    text-align: left;
+    gap: 22px;
+  }
+  .hero--home .hero__content { justify-content: center; align-items: center; text-align: center; }
+
+  .hero__eyebrow {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -.02em;
+    color: #fff;
+    max-width: 900px;
+    text-wrap: balance;
+  }
+  .hero--home .hero__title { font-size: clamp(42px, 8vw, 88px); }
+  .hero__lead {
+    margin: 0;
+    font-size: clamp(17px, 2.2vw, 20px);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--navy-100);
+    max-width: 620px;
+    text-wrap: pretty;
+  }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-start; margin-top: 6px; }
+  .hero--home .hero__ctas { justify-content: center; }
+</style>

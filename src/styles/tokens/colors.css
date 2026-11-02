@@ -1,0 +1,23 @@
+:root{
+/* Oro parroquial — base #CC9D53 */
+--gold-50:#FBF6EE;--gold-100:#F5EAD6;--gold-200:#EBD5AE;--gold-300:#E0BF86;--gold-400:#D6AE6C;--gold-500:#CC9D53;--gold-600:#B0833C;--gold-700:#8C672E;--gold-800:#684C22;--gold-900:#463316;
+/* Azul marino parroquial — base #122A41 */
+--navy-50:#EEF2F6;--navy-100:#D5DEE8;--navy-200:#ABBDCF;--navy-300:#7E97B1;--navy-400:#557391;--navy-500:#355574;--navy-600:#233F5B;--navy-700:#1A344E;--navy-800:#122A41;--navy-900:#0B1C2D;--navy-950:#07121D;
+/* Neutros cálidos (piedra / papel) */
+--white:#FFFFFF;--paper:#FAF7F2;--ivory:#F3EEE5;--stone-100:#E9E3D9;--stone-200:#D9D2C6;--stone-300:#BDB5A8;--stone-400:#9A9287;--stone-500:#77706A;--stone-600:#5A544F;--stone-700:#3F3B37;--stone-800:#2A2724;--ink:#1A1816;
+/* Semánticos */
+--green-600:#3F7A5A;--green-50:#EAF2ED;--amber-600:#A8691A;--amber-50:#FBF1E2;--red-600:#A63D32;--red-50:#F8E9E7;--blue-600:#355574;--blue-50:#EEF2F6;
+/* Colores litúrgicos (uso informativo: calendario, tiempos) */
+--lit-white:#F4EFE3;--lit-green:#3E6B48;--lit-purple:#5B3A6E;--lit-red:#9E2B25;--lit-rose:#C9828F;--lit-gold:#CC9D53;
+
+/* Alias semánticos */
+--brand-primary:var(--navy-800);--brand-accent:var(--gold-500);
+--surface-page:var(--white);--surface-subtle:var(--paper);--surface-muted:var(--ivory);--surface-card:var(--white);
+--surface-inverse:var(--navy-800);--surface-inverse-deep:var(--navy-900);--surface-accent:var(--gold-500);--surface-accent-soft:var(--gold-50);
+--text-heading:var(--navy-800);--text-body:var(--stone-800);--text-muted:var(--stone-600);--text-subtle:var(--stone-500);--text-accent:var(--gold-700);
+--text-on-inverse:var(--white);--text-on-inverse-muted:var(--navy-200);--text-accent-on-inverse:var(--gold-500);--text-on-accent:var(--navy-900);
+--border-subtle:var(--stone-100);--border-default:var(--stone-200);--border-strong:var(--stone-300);--border-inverse:rgba(255,255,255,.16);--border-accent:var(--gold-500);
+--focus-ring:var(--gold-500);
+--status-success:var(--green-600);--status-success-bg:var(--green-50);--status-warning:var(--amber-600);--status-warning-bg:var(--amber-50);--status-danger:var(--red-600);--status-danger-bg:var(--red-50);--status-info:var(--blue-600);--status-info-bg:var(--blue-50);
+--overlay-scrim:rgba(7,18,29,.64);--overlay-photo:linear-gradient(180deg,rgba(7,18,29,0) 35%,rgba(7,18,29,.78) 100%); /* @kind color */
+}

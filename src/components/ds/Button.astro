@@ -1,0 +1,87 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  variant?: 'primary' | 'accent' | 'secondary' | 'inverse' | 'ghost' | 'link';
+  size?: 'sm' | 'md' | 'lg';
+  icon?: string;
+  iconRight?: string;
+  fullWidth?: boolean;
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconRight,
+  fullWidth = false,
+  href,
+  type = 'button',
+  class: className,
+} = Astro.props;
+
+const iconSize = { sm: 14, md: 16, lg: 18 }[size];
+const Tag = href ? 'a' : 'button';
+---
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={['btn', `btn--${variant}`, `btn--${size}`, { 'btn--full': fullWidth }, className]}
+>
+  {icon && <Icon name={icon} size={iconSize} />}
+  <slot />
+  {iconRight && <Icon name={iconRight} size={iconSize} class="btn__arrow" />}
+</Tag>
+
+<style>
+  .btn {
+    --bg: var(--navy-800); --fg: #fff; --bd: var(--navy-800);
+    --hbg: var(--navy-700); --hfg: #fff; --hbd: var(--navy-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 var(--px);
+    height: var(--h);
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--bd);
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-heading);
+    font-size: var(--fs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-button);
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard);
+  }
+  .btn:hover { background: var(--hbg); color: var(--hfg); border-color: var(--hbd); }
+  .btn:active { transform: translateY(1px); }
+  .btn--full { display: flex; width: 100%; }
+
+  .btn--sm { --h: 36px; --px: 16px; --fs: 11px; }
+  .btn--md { --h: 44px; --px: 24px; --fs: 12px; }
+  .btn--lg { --h: 52px; --px: 32px; --fs: 13px; }
+
+  .btn--accent { --bg: var(--gold-500); --fg: var(--navy-900); --bd: var(--gold-500); --hbg: var(--gold-400); --hfg: var(--navy-900); --hbd: var(--gold-400); }
+  .btn--secondary { --bg: transparent; --fg: var(--navy-800); --bd: var(--navy-800); --hbg: var(--navy-800); --hfg: #fff; --hbd: var(--navy-800); }
+  .btn--inverse { --bg: transparent; --fg: #fff; --bd: rgba(255, 255, 255, .6); --hbg: #fff; --hfg: var(--navy-900); --hbd: #fff; }
+  .btn--ghost { --bg: transparent; --fg: var(--navy-800); --bd: transparent; --hbg: var(--ivory); --hfg: var(--navy-800); --hbd: transparent; }
+  .btn--link {
+    --bg: transparent; --fg: var(--navy-800); --bd: transparent; --hbg: transparent; --hfg: var(--gold-700); --hbd: transparent;
+    height: auto; padding: 0;
+    text-decoration: underline; text-decoration-color: var(--gold-500); text-underline-offset: 6px;
+  }
+  .btn--link:active { transform: none; }
+
+  .btn :global(.btn__arrow) { transition: transform var(--duration-fast) var(--ease-standard); }
+  .btn:hover :global(.btn__arrow) { transform: translateX(3px); }
+</style>
