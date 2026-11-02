@@ -98,3 +98,21 @@ a:hover { color: var(--text-accent); }
 .success__text { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text-muted); }
 
 [hidden] { display: none !important; }
+
+/* Page transitions: cross-document View Transitions (Chrome/Edge 126+, Safari 18.2+).
+   Browsers without support just navigate normally. The header keeps its own
+   transition group so it stays in place while the page content fades and rises. */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) { animation: page-out var(--duration-base) var(--ease-in-out) both; }
+::view-transition-new(root) { animation: page-in var(--duration-slow) var(--ease-out) both; }
+::view-transition-group(site-header) { animation-duration: var(--duration-base); }
+
+@keyframes page-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes page-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}

@@ -77,6 +77,14 @@ const desktopLinks = nav.slice(0, 6);
   desktop.addEventListener('change', (e) => {
     if (e.matches && menu && !menu.hidden) setMenu(false);
   });
+  // Coming back with the browser's back button can restore the page with the menu still open.
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted && menu && !menu.hidden) {
+      menu.hidden = true;
+      document.body.style.overflow = '';
+      openBtn?.setAttribute('aria-expanded', 'false');
+    }
+  });
 </script>
 
 <style>
@@ -87,6 +95,7 @@ const desktopLinks = nav.slice(0, 6);
     left: 0;
     right: 0;
     z-index: 30;
+    view-transition-name: site-header;
     height: var(--header-h);
     display: flex;
     align-items: center;
