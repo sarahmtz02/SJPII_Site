@@ -100,18 +100,22 @@ a:hover { color: var(--text-accent); }
 [hidden] { display: none !important; }
 
 /* Page transitions: cross-document View Transitions (Chrome/Edge 126+, Safari 18.2+).
-   Browsers without support just navigate normally. The incoming page fades in on top
-   of the outgoing one, which stays opaque underneath, so the white page background
-   never flashes between the dark heroes. Opacity only, no movement, so it also suits
-   visitors with reduced motion. The header has its own transition group and stays in
-   place. */
+   Browsers without support just navigate normally. Fade-through: the outgoing page
+   fades out to the parish navy, then the incoming page fades in from it. Opacity only,
+   no movement, so it also suits visitors with reduced motion. The header has its own
+   transition group and stays in place on top. */
 @view-transition { navigation: auto; }
 
-::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+::view-transition { background: var(--surface-inverse-deep); }
+::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: page-fade-in var(--duration-reveal) var(--ease-in-out) both;
+  animation-duration: var(--duration-reveal);
+  animation-timing-function: linear;
+  animation-fill-mode: both;
   mix-blend-mode: normal;
 }
+::view-transition-old(root) { animation-name: page-fade-out; }
+::view-transition-new(root) { animation-name: page-fade-in; }
 ::view-transition-group(site-header),
 ::view-transition-old(site-header),
 ::view-transition-new(site-header) {
@@ -119,4 +123,12 @@ a:hover { color: var(--text-accent); }
   animation-timing-function: var(--ease-in-out);
 }
 
-@keyframes page-fade-in { from { opacity: 0; } }
+/* Out over the first 40%, in over the rest; each half eases on its own. */
+@keyframes page-fade-out {
+  0% { opacity: 1; animation-timing-function: var(--ease-in-out); }
+  40%, 100% { opacity: 0; }
+}
+@keyframes page-fade-in {
+  0%, 40% { opacity: 0; animation-timing-function: var(--ease-in-out); }
+  100% { opacity: 1; }
+}
