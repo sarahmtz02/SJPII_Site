@@ -102,29 +102,21 @@ a:hover { color: var(--text-accent); }
 /* Page transitions: cross-document View Transitions (Chrome/Edge 126+, Safari 18.2+).
    Browsers without support just navigate normally. The incoming page fades in on top
    of the outgoing one, which stays opaque underneath, so the white page background
-   never flashes between the dark heroes. The header has its own transition group and
-   stays in place. */
+   never flashes between the dark heroes. Opacity only, no movement, so it also suits
+   visitors with reduced motion. The header has its own transition group and stays in
+   place. */
 @view-transition { navigation: auto; }
-
-:root { --duration-page: 600ms; }
 
 ::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
 ::view-transition-new(root) {
-  animation: page-in var(--duration-page) var(--ease-in-out) both;
+  animation: page-fade-in var(--duration-reveal) var(--ease-in-out) both;
   mix-blend-mode: normal;
 }
 ::view-transition-group(site-header),
 ::view-transition-old(site-header),
 ::view-transition-new(site-header) {
-  animation-duration: var(--duration-page);
+  animation-duration: var(--duration-reveal);
   animation-timing-function: var(--ease-in-out);
 }
 
-@keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
-@keyframes page-fade { from { opacity: 0; } }
-
-/* With reduced motion (e.g. Windows "Efectos de animación" off) keep a plain crossfade:
-   no movement, but no hard cut between pages either. */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-new(root) { animation-name: page-fade; }
-}
+@keyframes page-fade-in { from { opacity: 0; } }
