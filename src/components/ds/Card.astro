@@ -1,0 +1,143 @@
+---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  image?: string;
+  imageLabel?: string;
+  aspect?: string;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  meta?: string;
+  cta?: string;
+  href?: string;
+  variant?: 'default' | 'bordered' | 'overlay';
+  class?: string;
+}
+
+const {
+  image,
+  imageLabel,
+  aspect = '1/1',
+  eyebrow,
+  title,
+  description,
+  meta,
+  cta,
+  href,
+  variant = 'default',
+  class: className,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+const hasPhoto = image !== undefined || !!imageLabel;
+---
+{variant === 'overlay' ? (
+  <Tag href={href} class:list={['card-overlay', { clickable: !!href }, className]}>
+    <Photo src={image} label={imageLabel} aspect={aspect} overlay>
+      <div class="card-overlay__body">
+        {eyebrow && <span class="card-overlay__eyebrow">{eyebrow}</span>}
+        <span class="card-overlay__title">{title}</span>
+        {description && <span class="card-overlay__desc">{description}</span>}
+      </div>
+    </Photo>
+  </Tag>
+) : (
+  <Tag href={href} class:list={['card', { 'card--bordered': variant === 'bordered', clickable: !!href }, className]}>
+    {hasPhoto && (
+      <div class="card__media">
+        <Photo src={image} label={imageLabel} aspect={aspect} class="card__photo" />
+      </div>
+    )}
+    <div class="card__body">
+      {eyebrow && <span class="card__eyebrow">{eyebrow}</span>}
+      {title && <span class="card__title">{title}</span>}
+      {description && <span class="card__desc">{description}</span>}
+      {meta && <span class="card__meta">{meta}</span>}
+      {cta && (
+        <span class="card__cta">
+          {cta}
+          <Icon name="arrow-right" size={14} class="card__arrow" />
+        </span>
+      )}
+    </div>
+  </Tag>
+)}
+
+<style>
+  .card-overlay { display: block; text-decoration: none; }
+  .card-overlay__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-overlay__eyebrow,
+  .card__eyebrow {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+  }
+  .card-overlay__eyebrow { color: var(--gold-400); }
+  .card-overlay__title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+  }
+  .card-overlay__desc { font-size: 15px; line-height: 1.5; color: var(--navy-100); }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface-card);
+    overflow: hidden;
+    transition: box-shadow var(--duration-base) var(--ease-standard);
+  }
+  .card:hover { color: inherit; }
+  .card--bordered { border: 1px solid var(--border-default); border-radius: var(--radius-sm); }
+  .card--bordered.clickable:hover { box-shadow: var(--shadow-2); }
+
+  .card__media { overflow: hidden; }
+  .card :global(.card__photo) { transition: transform var(--duration-slow) var(--ease-standard); }
+  .card.clickable:hover :global(.card__photo) { transform: scale(1.03); }
+
+  .card__body { display: flex; flex-direction: column; gap: 10px; padding: 20px 0 0; }
+  .card--bordered .card__body { padding: 24px; }
+  .card__eyebrow { color: var(--text-accent); }
+  .card__title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-heading);
+    transition: color var(--duration-fast);
+  }
+  .card.clickable:hover .card__title { color: var(--gold-700); }
+  .card__desc { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .card__meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--text-subtle); }
+  .card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-button);
+    text-transform: uppercase;
+    color: var(--navy-800);
+  }
+  .card :global(.card__arrow) { transition: transform var(--duration-fast); }
+  .card:hover :global(.card__arrow) { transform: translateX(3px); }
+</style>

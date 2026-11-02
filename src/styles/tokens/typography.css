@@ -1,0 +1,15 @@
+:root{
+--font-heading:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+--font-body:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+--weight-light:300;--weight-regular:400;--weight-medium:500;--weight-semibold:600;--weight-bold:700;--weight-extrabold:800;
+/* Escala */
+--text-display-xl:88px;--text-display:64px;--text-h1:48px;--text-h2:36px;--text-h3:28px;--text-h4:22px;--text-h5:18px;
+--text-lead:20px;--text-body-lg:18px;--text-body:16px;--text-sm:14px;--text-xs:12px;--text-eyebrow:12px;
+--leading-tight:1.05;--leading-snug:1.2;--leading-heading:1.25;--leading-body:1.6;--leading-relaxed:1.75;
+--tracking-display:-0.02em;--tracking-heading:-0.01em;--tracking-normal:0;--tracking-eyebrow:0.18em;--tracking-button:0.08em;
+/* Roles */
+--type-display-family:var(--font-heading);--type-display-weight:var(--weight-bold);
+--type-heading-family:var(--font-heading);--type-heading-weight:var(--weight-bold);
+--type-eyebrow-family:var(--font-heading);--type-eyebrow-weight:var(--weight-semibold);
+--type-body-family:var(--font-body);--type-body-weight:var(--weight-regular);
+}

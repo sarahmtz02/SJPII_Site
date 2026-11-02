@@ -1,0 +1,116 @@
+---
+import IconButton from './ds/IconButton.astro';
+import { parish, routes } from '../data/site';
+
+const explore = [
+  { href: routes.horarios, label: 'Horarios' },
+  { href: routes.sacramentos, label: 'Sacramentos' },
+  { href: routes.comunidad, label: 'Comunidad' },
+  { href: routes.eventos, label: 'Eventos' },
+  { href: routes.oracion, label: 'Peticiones de oración' },
+  { href: routes.donativos, label: 'Donativos' },
+  { href: routes.nosotros, label: 'Nosotros' },
+];
+---
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="/assets/logo-psjpii.png" alt="Parroquia San Juan Pablo II, Corregidora, Qro." width="200" height="82" />
+        <p class="site-footer__motto">Una comunidad que camina contigo.</p>
+        <div class="site-footer__social">
+          <IconButton icon="facebook" label="Facebook" variant="inverse" size="sm" href={parish.social.facebook} />
+          <IconButton icon="instagram" label="Instagram" variant="inverse" size="sm" href={parish.social.instagram} />
+          <IconButton icon="youtube" label="YouTube" variant="inverse" size="sm" href={parish.social.youtube} />
+        </div>
+      </div>
+      <div class="site-footer__col">
+        <span class="site-footer__label">Visítanos</span>
+        <span>{parish.address}</span>
+        <span>{parish.city}</span>
+        <a href={`${routes.nosotros}#contacto`} class="site-footer__underline">Cómo llegar</a>
+      </div>
+      <div class="site-footer__col">
+        <span class="site-footer__label">Despacho</span>
+        {parish.officeHours.map((h) => <span>{h}</span>)}
+        <span>{parish.phone}</span>
+      </div>
+      <nav class="site-footer__col" aria-label="Explora">
+        <span class="site-footer__label">Explora</span>
+        {explore.map((l) => <a href={l.href} class="site-footer__link">{l.label}</a>)}
+      </nav>
+    </div>
+    <div class="site-footer__legal">
+      <span>© 2026 Parroquia San Juan Pablo II · Diócesis de Querétaro</span>
+      <a href="#">Aviso de privacidad</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface-inverse-deep);
+    color: #fff;
+    padding: clamp(56px, 8vw, 80px) clamp(20px, 5vw, 40px) 32px;
+  }
+  .site-footer__inner { max-width: var(--container-max); margin: 0 auto; }
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border-inverse);
+  }
+  .site-footer__brand { display: flex; flex-direction: column; gap: 20px; }
+  .site-footer__brand img { width: 200px; max-width: 100%; height: auto; filter: invert(1); }
+  .site-footer__motto {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
+    margin: 0;
+    max-width: 300px;
+    text-wrap: balance;
+  }
+  .site-footer__social { display: flex; gap: 8px; }
+
+  .site-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--navy-200);
+  }
+  .site-footer__label {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold-500);
+    margin-bottom: 6px;
+  }
+  .site-footer__underline {
+    color: var(--navy-100);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-underline-offset: 4px;
+  }
+  .site-footer__link { color: var(--navy-100); text-decoration: none; }
+  .site-footer__underline:hover,
+  .site-footer__link:hover { color: var(--gold-400); }
+
+  .site-footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    justify-content: space-between;
+    padding-top: 24px;
+    font-size: 12px;
+    color: var(--navy-300);
+  }
+  .site-footer__legal a { color: var(--navy-300); text-decoration: none; }
+  .site-footer__legal a:hover { color: var(--navy-100); }
+</style>

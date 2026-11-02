@@ -1,0 +1,51 @@
+---
+// Photo frame. Shows the striped navy placeholder with a label until a real photo (src) exists.
+interface Props {
+  src?: string;
+  alt?: string;
+  label?: string;
+  aspect?: string;
+  overlay?: boolean;
+  radius?: string;
+  class?: string;
+}
+
+const { src, alt = '', label = 'Fotografía', aspect = '16/9', overlay = false, radius = '0', class: className } = Astro.props;
+const hasChildren = Astro.slots.has('default');
+---
+<div class:list={['photo', className]} style={`aspect-ratio:${aspect};border-radius:${radius}`}>
+  {src ? (
+    <img src={src} alt={alt} loading="lazy" decoding="async" />
+  ) : (
+    <div class="photo__placeholder">
+      {!hasChildren && label && <span class="photo__label">{label}</span>}
+    </div>
+  )}
+  {overlay && <div class="photo__overlay" />}
+  {hasChildren && <div class="photo__content"><slot /></div>}
+</div>
+
+<style>
+  .photo { position: relative; overflow: hidden; background: var(--navy-700); }
+  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-linear-gradient(135deg, var(--navy-700) 0 14px, var(--navy-800) 14px 28px);
+  }
+  .photo__label {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--navy-200);
+    background: var(--navy-900);
+    padding: 6px 10px;
+  }
+  .photo__overlay { position: absolute; inset: 0; background: var(--overlay-photo); }
+  .photo__content { position: absolute; inset: 0; }
+</style>

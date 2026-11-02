@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+type Props = HTMLAttributes<'button'> & {
+  icon: string;
+  label: string;
+  variant?: 'ghost' | 'outline' | 'primary' | 'inverse';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+};
+
+const { icon, label, variant = 'ghost', size = 'md', href, class: className, ...rest } = Astro.props;
+
+const iconSize = { sm: 16, md: 20, lg: 22 }[size];
+const Tag = href ? 'a' : 'button';
+---
+<Tag
+  href={href}
+  type={href ? undefined : 'button'}
+  aria-label={label}
+  title={label}
+  class:list={['icon-btn', `icon-btn--${variant}`, `icon-btn--${size}`, className]}
+  {...rest}
+>
+  <Icon name={icon} size={iconSize} />
+</Tag>
+
+<style>
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--d);
+    height: var(--d);
+    padding: 0;
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--bd);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+  }
+  .icon-btn--sm { --d: 36px; }
+  .icon-btn--md { --d: 44px; }
+  .icon-btn--lg { --d: 52px; }
+
+  .icon-btn--ghost { --bg: transparent; --fg: var(--navy-800); --bd: transparent; }
+  .icon-btn--ghost:hover { --bg: var(--ivory); }
+  .icon-btn--outline { --bg: transparent; --fg: var(--navy-800); --bd: var(--border-strong); }
+  .icon-btn--outline:hover { --bg: var(--navy-800); --fg: #fff; }
+  .icon-btn--primary { --bg: var(--navy-800); --fg: #fff; --bd: transparent; }
+  .icon-btn--primary:hover { --bg: var(--navy-700); }
+  .icon-btn--inverse { --bg: transparent; --fg: #fff; --bd: rgba(255, 255, 255, .35); }
+  .icon-btn--inverse:hover { --bg: rgba(255, 255, 255, .12); }
+  .icon-btn:hover { color: var(--fg); }
+</style>

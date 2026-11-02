@@ -1,0 +1,42 @@
+---
+// Lucide icon, inlined at build time from lucide-static (same set the design system loads by CDN).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+interface Props {
+  name: string;
+  size?: number;
+  color?: string;
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 20, color = 'currentColor', label, class: className } = Astro.props;
+
+const file = join(process.cwd(), 'node_modules', 'lucide-static', 'icons', `${name}.svg`);
+const inner = readFileSync(file, 'utf8')
+  .replace(/<!--[\s\S]*?-->/, '')
+  .replace(/^[\s\S]*?<svg[^>]*>/, '')
+  .replace(/<\/svg>\s*$/, '');
+---
+<svg
+  class:list={['icon', className]}
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  style={`color:${color}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  set:html={inner}
+/>
+
+<style>
+  .icon { display: inline-block; flex: none; vertical-align: middle; }
+</style>

@@ -1,0 +1,240 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/ds/SectionHeading.astro';
+import Card from '../components/ds/Card.astro';
+import Button from '../components/ds/Button.astro';
+import Icon from '../components/ds/Icon.astro';
+import { parish, routes } from '../data/site';
+
+const quickFacts = [
+  { icon: 'clock', label: 'Próxima Misa', value: 'Hoy, 19:00' },
+  { icon: 'map-pin', label: 'Templo parroquial', value: parish.city },
+  { icon: 'phone', label: 'Despacho parroquial', value: parish.phone },
+];
+
+const domingo = [
+  { h: '08:00', t: 'Misa' },
+  { h: '10:00', t: 'Misa con niños' },
+  { h: '12:00', t: 'Misa' },
+  { h: '19:00', t: 'Misa con jóvenes' },
+];
+
+const grupos = [
+  { t: 'Pastoral Juvenil', e: 'Jóvenes', d: 'Viernes 19:30, salón parroquial.' },
+  { t: 'Matrimonios', e: 'Familias', d: 'Un sábado al mes, 18:00.' },
+  { t: 'Catequesis infantil', e: 'Niños', d: 'Sábados 10:00 a 12:00.' },
+  { t: 'Coro parroquial', e: 'Liturgia', d: 'Ensayos los jueves 20:00.' },
+];
+
+const eventos = [
+  { t: 'Retiro de Adviento', f: 'Sáb 28 nov · 09:00', l: 'Salón parroquial' },
+  { t: 'Posadas parroquiales', f: '16 – 24 dic · 19:30', l: 'Atrio del templo' },
+];
+---
+<BaseLayout
+  title="Inicio · Parroquia San Juan Pablo II"
+  description="Parroquia San Juan Pablo II en Corregidora, Querétaro. Horarios de Misa, grupos, eventos y peticiones de oración."
+  active="inicio"
+  headerOverHero
+>
+  <PageHero
+    size="home"
+    eyebrow="Parroquia San Juan Pablo II · Corregidora"
+    title="Aquí hay lugar para ti."
+    lead="No importa de dónde vengas ni lo que traigas contigo. Somos una comunidad que cree en Jesús y quiere caminar a tu lado."
+    photoLabel="Foto: Interior del templo, Misa dominical"
+    cta1="Planea tu visita"
+    cta1Href={routes.horarios}
+    cta2="Misa en vivo"
+    cta2Icon="play"
+    cta2Href={parish.liveStream}
+  />
+
+  <section class="facts" data-section="datos-rapidos">
+    <div class="facts__grid">
+      {quickFacts.map((f) => (
+        <div class="facts__item">
+          <Icon name={f.icon} size={22} color="var(--gold-500)" />
+          <div>
+            <div class="facts__label">{f.label}</div>
+            <div class="facts__value">{f.value}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="eucaristia" data-section="eucaristia">
+    <div class="container eucaristia__grid">
+      <SectionHeading
+        eyebrow="Celebra con nosotros"
+        title="La Eucaristía es el centro de nuestra vida"
+        lead="Cada domingo nos reunimos como familia. Si es tu primera vez, llega unos minutos antes: alguien del equipo de bienvenida te recibirá en la entrada."
+      />
+      <div class="schedule">
+        {domingo.map((m) => (
+          <div class="schedule__row">
+            <span class="schedule__time">{m.h}</span>
+            <span class="schedule__what">Domingo · {m.t}</span>
+          </div>
+        ))}
+        <div class="schedule__more">
+          <a href={routes.horarios} class="text-link">Todos los horarios</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="comunidad" data-section="comunidad">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Comunidad"
+        title="Encuentra tu lugar"
+        align="center"
+        lead="Grupos para cada etapa de la vida. Nadie tiene que caminar solo."
+      />
+      <div class="comunidad__grid">
+        {grupos.map((g) => (
+          <Card imageLabel={`Foto: ${g.t}`} eyebrow={g.e} title={g.t} description={g.d} href={routes.comunidad} />
+        ))}
+      </div>
+      <div class="comunidad__more">
+        <Button variant="secondary" href={routes.comunidad} iconRight="arrow-right">Ver todos los grupos</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="eventos" data-section="eventos">
+    <div class="container">
+      <div class="eventos__head">
+        <SectionHeading eyebrow="Próximamente" title="Eventos parroquiales" />
+        <Button variant="secondary" icon="calendar" href={routes.eventos}>Ver calendario</Button>
+      </div>
+      <div class="eventos__grid">
+        {eventos.map((e) => (
+          <Card variant="overlay" aspect="16/9" imageLabel={`Foto: ${e.t}`} eyebrow={e.f} title={e.t} description={e.l} href={routes.eventos} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="oracion" data-section="oracion">
+    <div class="container oracion__inner">
+      <SectionHeading
+        inverse
+        align="center"
+        size="lg"
+        eyebrow="Oración"
+        title="¿Atraviesas un momento difícil?"
+        lead="No tienes que cargarlo solo. Comparte tu intención y nuestra comunidad orará por ti. Si lo necesitas, un sacerdote puede escucharte."
+      />
+      <div class="oracion__ctas">
+        <Button variant="accent" href={routes.oracion}>Compartir mi intención</Button>
+        <Button variant="inverse" href={`${routes.nosotros}#contacto`}>Hablar con un sacerdote</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Datos rápidos */
+  .facts { background: var(--surface-inverse); }
+  .facts__grid {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 8px clamp(20px, 5vw, 40px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    color: #fff;
+  }
+  .facts__item {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-inverse);
+  }
+  .facts__label {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--navy-200);
+  }
+  .facts__value { font-family: var(--font-heading); font-size: 17px; font-weight: 600; }
+
+  /* Eucaristía */
+  .eucaristia { padding: clamp(56px, 10vw, 96px) 0; }
+  .eucaristia__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: clamp(40px, 6vw, 80px);
+    align-items: center;
+  }
+  .schedule { border-top: 2px solid var(--text-heading); }
+  .schedule__row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .schedule__time {
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--text-heading);
+    width: 96px;
+    flex: none;
+  }
+  .schedule__what { font-size: 16px; color: var(--text-muted); }
+  .schedule__more { padding-top: 24px; }
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-heading);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-underline-offset: 6px;
+  }
+  .text-link:hover { color: var(--text-accent); }
+
+  /* Comunidad */
+  .comunidad { padding: 0 0 clamp(56px, 10vw, 96px); }
+  .comunidad__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .comunidad__more { display: flex; justify-content: center; margin-top: 40px; }
+
+  /* Eventos */
+  .eventos { background: var(--surface-subtle); padding: clamp(56px, 10vw, 96px) 0; }
+  .eventos__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+  .eventos__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 24px;
+  }
+
+  /* Oración */
+  .oracion { background: var(--surface-inverse); padding: clamp(64px, 10vw, 96px) 0; }
+  .oracion__inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 32px; }
+  .oracion__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+</style>
